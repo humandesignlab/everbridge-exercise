@@ -1,0 +1,27 @@
+.timerCardHeader {
+	border-bottom: 1px solid #cccccc;
+}
+
+.inputDataText input {
+	text-align:right;
+	color: transparent
+}
+
+.inputContainer {
+
+}
+
+.inputDataContainer {
+	top: 40px;
+	position: relative;
+	z-index: 1;
+}
+
+.inputDataText {
+	
+}
+
+.inputViewContainer {
+top: 10px;
+position: relative
+}
