@@ -1,10 +1,4 @@
-import React, {
-  ChangeEvent,
-  useEffect,
-  useState,
-  createRef,
-  useRef,
-} from 'react';
+import React, { ChangeEvent, useEffect, useState, createRef } from 'react';
 import './styles.css';
 import {
   Avatar,
