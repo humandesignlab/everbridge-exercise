@@ -1,4 +1,10 @@
-import React, { ChangeEvent, useEffect, useState, createRef } from 'react';
+import React, {
+  ChangeEvent,
+  useEffect,
+  useState,
+  createRef,
+  useCallback,
+} from 'react';
 import './styles.css';
 import {
   Avatar,
@@ -20,13 +26,16 @@ type InputEvent = {
 const defaultTimeDigits = [''];
 const defaultTimeView = '00h 00m 00s';
 const defaultTimeUnits = [0, 0, 0];
-// ToDo: Implement coutdown functionality
+
 function Timer() {
   const [timeDigits, setTimeDigits] = useState(defaultTimeDigits);
   const [timeView, setTimeView] = useState(defaultTimeView);
   const [timeUnits, setTimeUnits] = useState(defaultTimeUnits);
   const [ctaStartStop, setCtaStartStop] = useState(false);
   const [hasFocus, setHasFocus] = useState(false);
+  const [hours, setHours] = useState(0);
+  const [minutes, setMinutes] = useState(0);
+  const [seconds, setSeconds] = useState(0);
 
   const inputRef: any = createRef();
 
@@ -64,9 +73,43 @@ function Timer() {
     };
   }, [timeView, timeDigits, inputRef, hasFocus]);
 
-  // useEffect(() => {
-  //   setInterval(() => {}, 100);
-  // });
+  //Implement coutdown functionality
+  const startTimer = useCallback(() => {
+    if (hours === 0 && minutes === 0 && seconds === 0) {
+      setHours(timeUnits[0]);
+      setMinutes(timeUnits[1]);
+      setSeconds(timeUnits[2]);
+    }
+
+    if (hours > 0 || minutes > 0 || seconds > 0) {
+      setSeconds(seconds - 1);
+      if (hours > 0 || minutes >= 0 || seconds >= 0) {
+        if (hours > 0 && minutes === 0 && seconds < 0) {
+          setHours(hours - 1);
+          setMinutes(59);
+          setSeconds(59);
+        } else if (minutes > 0 && seconds <= 0) {
+          setSeconds(59);
+          setMinutes(minutes - 1);
+        } else if ((hours > 0 || minutes > 0) && seconds < 0) {
+          setSeconds(59);
+        }
+      }
+    }
+  }, [hours, minutes, seconds, timeUnits]);
+
+  useEffect(() => {
+    const interval = setInterval(
+      () => (ctaStartStop ? startTimer() : null),
+      1000,
+    );
+    console.log('hours ', hours);
+    console.log('minutes ', minutes);
+    console.log('seconds ', seconds);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [ctaStartStop, startTimer, hours, minutes, seconds]);
 
   function handleTimeInput(e: InputEvent['event']) {
     let timeChunk = e.target.value;
@@ -81,7 +124,7 @@ function Timer() {
     ctaStartStop ? setCtaStartStop(false) : setCtaStartStop(true);
   }
 
-  function renderTimer() {
+  function renderTimerInput() {
     return `${timeUnits[0] || '00'}h ${timeUnits[1] || '00'}m ${
       timeUnits[2] || '00'
     }s`;
@@ -121,6 +164,9 @@ function Timer() {
     setTimeDigits(defaultTimeDigits);
     setTimeView(defaultTimeView);
     setTimeUnits(defaultTimeUnits);
+    setHours(0);
+    setMinutes(0);
+    setSeconds(0);
   }
 
   function handleInputBlur() {
@@ -164,7 +210,7 @@ function Timer() {
             </Box>
             <Box className="inputViewContainer">
               <Typography gutterBottom variant="h5" component="div">
-                {hasFocus ? timeView : renderTimer()}
+                {hasFocus ? timeView : renderTimerInput()}
               </Typography>
             </Box>
           </Box>
